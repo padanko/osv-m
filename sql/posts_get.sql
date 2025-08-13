@@ -1,0 +1,1 @@
+SELECT post_name, user_id, date_time, body FROM osvm_posts WHERE bbs_id = $1 AND topic_id = $2

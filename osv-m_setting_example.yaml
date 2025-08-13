@@ -1,0 +1,35 @@
+title: ぶいちゃんねる
+description: 「さとるアンチ」から「おんJ閉鎖」まで手広くカバーする2ちゃんねる風掲示板
+base_url: http://localhost:8282
+bind_addr: localhost
+bind_port: 8282
+cloudflare_dns_proxy: false
+id_length: 3
+id_charset: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+id_raw_prefix: "OSVMHonzawaServer"
+html_folder: ./html/*.html
+postgresql_addr: localhost
+postgresql_port: 5432
+postgresql_username: postgres
+postgresql_password: hoge # 一例
+postgresql_database: huga # 一例
+
+bbs:
+  inkor:
+    title: いんこ
+    description_html: いんこ
+    banner: ""
+    default_name: "名無しさん"
+    restriction_min_level: 0
+    restriction_handlename: false
+    restriction_image: false
+    name_max_length: 12
+    title_max_length: 30
+    body_max_length: 100
+    restriction_words: []
+    hide_id: false
+
+
+topic_id_digcount: null
+
+datetime_format: "%Y/%m/%d %H:%M:%S"
