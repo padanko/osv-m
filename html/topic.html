@@ -8,9 +8,19 @@
         .name {
             color: green;
         }
+        
         pre {
             margin: 0;
             padding: 0;
+        }
+
+        .image-post {
+            width: 100%;
+            max-width: 550px;
+            height: auto;
+        }
+        .random {
+            color: orange;
         }
     </style>
 </head>
@@ -58,7 +68,13 @@
         </table>
         <label for="mt-body">本文:</label><br>
         <textarea id="mt-body" style="width: 100%;" rows="4" name="body"></textarea>
-        <button style="width: 100%; height:50px;" onclick="post()">トピック作成</button>
+        <button style="width: 100%; height:50px;" onclick="post()">書き込み</button>
+        <br><br>
+        <label for="mt-cmd-args">引数: </label>
+        <input type="text" id="mt-cmd-args"><br>
+        <button onclick="cmd('Img')">画像</button>&nbsp;
+        <button onclick="cmd('URL')">URL</button>
+
     </div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -80,16 +96,22 @@
                 password: mt_password.value,
             },
             success: ()=>{
-                mt_body.value = ""
+                mt_body.value = "";
             },
             error: (_, e)=>{
-                alert(e)
+                alert(e);
             }
         })
     }
 
     function reply(to) {
         mt_body.value = `>>${to}\n${mt_body.value}`
+    }
+
+    function cmd(cmd) {
+        var mt_cmd_args = document.getElementById("mt-cmd-args");
+        mt_body.value = `!${cmd}:${mt_cmd_args.value}\n${mt_body.value}`;
+        mt_cmd_args.value = "";
     }
 
     function long_poll() {

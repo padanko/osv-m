@@ -16,6 +16,9 @@ mod views;
 mod controls;
 mod models;
 
+// エクスクラメーションマークから始まるコマンド群
+mod commands;
+
 use once_cell::sync::Lazy;
 
 const SETTING: Lazy<utils::setting::ApplicationSetting> = Lazy::new(|| {

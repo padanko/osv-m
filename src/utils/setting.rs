@@ -54,6 +54,9 @@ pub struct ApplicationSetting {
 
     // フォーマット
     pub datetime_format: String,
+
+    // コマンド
+    pub enable_command: bool
 }
 
 const SETTING_FILENAME: &str = "./osv-m_setting.yaml";

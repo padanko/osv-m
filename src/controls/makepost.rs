@@ -22,6 +22,12 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data
     let mut name = &utils::html::html_escape(&data.name);
     let body = &utils::html::html_escape(&data.body);
 
+    let body = if SETTING.enable_command {
+        &crate::commands::apply_all(&body)
+    } else {
+        body
+    };
+    
     let ip_addr = utils::get_ip::get_ipaddr_from_header(&req).unwrap_or(String::from("???"));
 
     let bbs_ = &SETTING.bbs;
