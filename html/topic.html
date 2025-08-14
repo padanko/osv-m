@@ -28,7 +28,9 @@
                 <a onclick="reply('{{loop.index}}')">{{loop.index}}</a>:&nbsp;
                 <b class="name">{{post.name|safe}}</b>:&nbsp;
                 <span>{{post.datetime}}</span>&nbsp;&nbsp;
+                {% if not hide_id %}
                 <span>ID:&nbsp;<span>{{post.id}}</span></span>
+                {% endif %}
             </dt>
             <dd><pre>{{post.body|safe}}</pre></dd>
         </dl>
@@ -67,6 +69,7 @@
     const mt_password = document.getElementById("mt-password");
     const topic_data = document.getElementById("topic_data");
 
+
     function post() {
         $.ajax({
             url: "{{baseurl|safe}}/{{bbs_id}}/make/post/{{topic_id}}",
@@ -96,10 +99,6 @@
             success: (d)=>{
                 console.log(d);
                 long_poll();
-                // name	"あ"
-                // datetime	"2025/08/14 12:42:08"
-                // id	"Igmd"
-                // body	"aaaa"
 
                 var index = topic_data.querySelectorAll("dl").length + 1;
 
@@ -110,7 +109,9 @@
         <a onclick="reply('${index}')">${index}</a>:&nbsp;
         <b class="name">${d.name}</b>:&nbsp;
         <span>${d.datetime}</span>&nbsp;&nbsp;
+        {% if not hide_id %}
         <span>ID:&nbsp;<span>${d.id}</span></span>
+        {% endif %}
     </dt>
     <dd><pre>${d.body}</pre></dd>
 </dl>`
