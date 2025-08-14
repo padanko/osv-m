@@ -1,0 +1,1 @@
+UPDATE osvm_userlist SET vacuum = $1, user_level = $2 WHERE user_ip = $3

@@ -14,3 +14,9 @@ CREATE TABLE osvm_posts (
     bbs_id TEXT NOT NULL,
     topic_id TEXT NOT NULL
 );
+
+CREATE TABLE osvm_userlist (
+    user_ip TEXT NOT NULL,
+    vacuum BOOLEAN NOT NULL,
+    user_level INTEGER NOT NULL,
+);

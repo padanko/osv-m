@@ -1,6 +1,10 @@
 use actix_web::{HttpRequest, Responder, HttpResponse};
 use actix_web::web::{Form, Path};
 use serde::Deserialize;
+
+use tokio::time::{Duration, sleep};
+
+use crate::models::user::User;
 use crate::models::post::Post;
 use crate::models::topic::Topic;
 use crate::utils::restriction;
@@ -25,6 +29,20 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsPath>, data: For
 
     let ip_addr = utils::get_ip::get_ipaddr_from_header(&req).unwrap_or(String::from("???"));
 
+    let mut user = if let Ok(user) = User::new(&ip_addr).await {
+        user
+    } else {
+        return HttpResponse::InternalServerError()
+            .body(include_str!("../../default_html/error_user_get.html"))
+    };
+
+    let body = if SETTING.enable_command {
+        &crate::commands::apply_all(&body, &user)
+    } else {
+        body
+    };
+
+
     let bbs_ = &SETTING.bbs;
 
     if let Some(bbs_setting) = bbs_.get(&bbspath.bbs_id) {
@@ -42,9 +60,21 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsPath>, data: For
                 .body(include_str!("../../default_html/error_has_length_exceeds.html"));
         }
 
-        if restriction::body_check(body, bbs_setting) {
+        if restriction::body_check(body, bbs_setting) || user.vacuum || user.level < bbs_setting.restriction_min_level {
+            user.vacuum = true;
+            let _ = user.update().await;
+
+            let period_vacuum = bbs_setting.vacuum_period_sec;
+
+            tokio::spawn(async move {
+                sleep(Duration::from_secs(period_vacuum)).await;
+                user.vacuum = false;
+                let _ = user.update().await;
+            });
+
             return HttpResponse::Forbidden()
                 .body(include_str!("../../default_html/error_unknown.html"));
+            
         }
 
     }
@@ -52,6 +82,7 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsPath>, data: For
     
     if !title.is_empty() && !body.is_empty() {
 
+        user.level -= 2;
 
         let topic = Topic::new(&data.title, password, None, &bbspath.bbs_id);
 
@@ -59,7 +90,8 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsPath>, data: For
 
             Ok(()) => {
 
-                let post = Post::new(name, body, &ip_addr);
+                let post = Post::new(name, body, &user);
+
                 
                 let _ = topic.post(post).await;
 

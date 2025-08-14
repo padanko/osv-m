@@ -16,6 +16,7 @@ pub struct BbsSetting {
     pub restriction_min_level: usize,
     pub restriction_handlename: bool,
     pub restriction_image: bool,
+    pub vacuum_period_sec: u64,
     pub name_max_length: usize,
     pub body_max_length: usize,
     pub title_max_length: usize,

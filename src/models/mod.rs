@@ -1,5 +1,6 @@
 pub mod topic;
 pub mod post;
+pub mod user;
 
 use crate::SETTING;
 use sqlx::{Pool, Postgres};

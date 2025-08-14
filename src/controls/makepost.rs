@@ -1,12 +1,15 @@
 use actix_web::{HttpRequest, Responder, HttpResponse};
 use actix_web::web::{Form, Path};
 use serde::Deserialize;
+
 use crate::models::post::Post;
 use crate::models::topic::Topic;
+use crate::models::user::User;
 use crate::utils::random_id::random_integer;
 use crate::utils::restriction;
 use crate::{utils, PollState, POLL_INSTANCE, SETTING};
 
+use tokio::time::{Duration, sleep};
 
 #[derive(Deserialize)]
 pub struct MakeTopicJson {
@@ -22,13 +25,20 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data
     let mut name = &utils::html::html_escape(&data.name);
     let body = &utils::html::html_escape(&data.body);
 
+    let ip_addr = utils::get_ip::get_ipaddr_from_header(&req).unwrap_or(String::from("???"));
+
+    let mut user = if let Ok(user) = User::new(&ip_addr).await {
+        user
+    } else {
+        return HttpResponse::InternalServerError()
+            .body(include_str!("../../default_html/error_user_get.html"))
+    };
+
     let body = if SETTING.enable_command {
-        &crate::commands::apply_all(&body)
+        &crate::commands::apply_all(&body, &user)
     } else {
         body
     };
-    
-    let ip_addr = utils::get_ip::get_ipaddr_from_header(&req).unwrap_or(String::from("???"));
 
     let bbs_ = &SETTING.bbs;
 
@@ -46,7 +56,18 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data
                 .body(include_str!("../../default_html/error_has_length_exceeds.html"));
         }
 
-        if restriction::body_check(body, bbs_setting) {
+        if restriction::body_check(body, bbs_setting) || user.vacuum {
+            user.vacuum = true;
+
+            
+            let period_vacuum = bbs_setting.vacuum_period_sec;
+
+            tokio::spawn(async move {
+                sleep(Duration::from_secs(period_vacuum)).await;
+                user.vacuum = false;
+                let _ = user.update().await;
+            });
+
             return HttpResponse::Forbidden()
                 .body(include_str!("../../default_html/error_unknown.html"));
         }
@@ -56,6 +77,9 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data
     
     if !body.is_empty() {
 
+        user.level += 1;
+
+        let _ = user.update().await;
 
         let topic = Topic::from(&bbspath.bbs_id, &bbspath.topic_id).await;
 
@@ -73,7 +97,7 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data
 
                 if password_is_valid {
 
-                    let post = Post::new(name, body, &ip_addr);
+                    let post = Post::new(name, body, &user);
                     
                     match topic.post(post).await {
                         Ok(()) => {
@@ -102,7 +126,6 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data
             Err(_) => {
                 HttpResponse::InternalServerError()
                     .body(include_str!("../../default_html/error_unknown.html"))
-
             } 
         }
     } else {

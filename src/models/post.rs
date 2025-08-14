@@ -30,12 +30,12 @@ impl Post {
     pub fn new(
         name: &str,
         body: &str,
-        ip_addr: &str,
+        user: &super::user::User,
     ) -> Self {
         Self {
             name: name.to_string(),
             body: body.to_string(),
-            user_id: random_id::generate_user_id(ip_addr),
+            user_id: random_id::generate_user_id(&user.ip_addr),
             datetime: Local::now().naive_local()
         }
     }

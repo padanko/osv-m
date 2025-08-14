@@ -1,0 +1,1 @@
+INSERT INTO osvm_userlist (user_ip, vacuum, user_level) VALUES ($1, FALSE, 1)

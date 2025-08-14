@@ -18,7 +18,10 @@ pub async fn endpoint(data: Data<ActixWebData>) -> impl Responder {
 
     let setting = &SETTING;
 
-    let bbslist: Vec<&String> = setting.bbs.keys().collect();
+    let mut bbslist: Vec<&String> = setting.bbs.keys().collect();
+
+    bbslist.sort();
+
     let mut bbslist_: Vec<BbsList> = Vec::new();
 
     for bbsid in bbslist {
@@ -29,6 +32,7 @@ pub async fn endpoint(data: Data<ActixWebData>) -> impl Responder {
             })        
         }
     }
+
 
     ctx.insert("bbslist", &bbslist_);
     ctx.insert("title", &setting.title);
