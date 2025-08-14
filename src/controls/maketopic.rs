@@ -19,7 +19,7 @@ pub struct MakeTopicForm {
 pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsPath>, data: Form<MakeTopicForm>) -> impl Responder {
 
     let title = &data.title;
-    let mut name = &data.name;
+    let mut name = &utils::html::html_escape(&data.name);
     let body = &utils::html::html_escape(&data.body);
     let password = if (&data).password.is_empty() { None } else { Some(data.password.clone()) };
 

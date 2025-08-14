@@ -21,17 +21,19 @@
     <a href="{{baseurl|safe}}">■{{title}}</a>
     <hr>
     <h1 style="color: red;">{{topic_title}}</h1>
+    <div id="topic_data">
     {% for post in posts %}
-    <dl>
-        <dt>
-            <a onclick="reply('{{loop.index}}')">{{loop.index}}</a>:&nbsp;
-            <b class="name">{{post.name}}</b>:&nbsp;
-            <span>{{post.datetime}}</span>&nbsp;&nbsp;
-            <span>ID:&nbsp;<span>{{post.id}}</span></span>
-        </dt>
-        <dd><pre>{{post.body|safe}}</pre></dd>
-    </dl>
+        <dl>
+            <dt>
+                <a onclick="reply('{{loop.index}}')">{{loop.index}}</a>:&nbsp;
+                <b class="name">{{post.name|safe}}</b>:&nbsp;
+                <span>{{post.datetime}}</span>&nbsp;&nbsp;
+                <span>ID:&nbsp;<span>{{post.id}}</span></span>
+            </dt>
+            <dd><pre>{{post.body|safe}}</pre></dd>
+        </dl>
     {% endfor %}
+    </div>
     <hr>
     <a href="{{baseurl|safe}}/{{bbs_id}}/">■板に戻る</a>
     &nbsp;|&nbsp;
@@ -63,6 +65,7 @@
     const mt_body = document.getElementById("mt-body");
     const mt_name = document.getElementById("mt-name");
     const mt_password = document.getElementById("mt-password");
+    const topic_data = document.getElementById("topic_data");
 
     function post() {
         $.ajax({
@@ -85,5 +88,42 @@
     function reply(to) {
         mt_body.value = `>>${to}\n${mt_body.value}`
     }
+
+    function long_poll() {
+        $.ajax({
+            url: "{{baseurl|safe}}/{{bbs_id}}/poll/{{topic_id}}",
+            type: "GET",
+            success: (d)=>{
+                console.log(d);
+                long_poll();
+                // name	"あ"
+                // datetime	"2025/08/14 12:42:08"
+                // id	"Igmd"
+                // body	"aaaa"
+
+                var index = topic_data.querySelectorAll("dl").length + 1;
+
+                var topic = document.createElement("dl");
+
+                topic.innerHTML=`<dl>
+    <dt>
+        <a onclick="reply('${index}')">${index}</a>:&nbsp;
+        <b class="name">${d.name}</b>:&nbsp;
+        <span>${d.datetime}</span>&nbsp;&nbsp;
+        <span>ID:&nbsp;<span>${d.id}</span></span>
+    </dt>
+    <dd><pre>${d.body}</pre></dd>
+</dl>`
+
+                topic_data.appendChild(topic);
+            },
+            cache: (e) => {
+                console.error(e);
+                setTimeout(long_poll, 5000);
+            }
+        })
+    }
+
+    long_poll()
 </script>
 </html>

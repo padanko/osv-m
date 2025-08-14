@@ -1,5 +1,7 @@
 pub mod maketopic;
 pub mod makepost;
+pub mod reload;
+
 use serde::Deserialize;
 
 #[derive(Deserialize)]

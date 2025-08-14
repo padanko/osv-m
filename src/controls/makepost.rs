@@ -1,10 +1,11 @@
 use actix_web::{HttpRequest, Responder, HttpResponse};
-use actix_web::web::{Form, Json, Path};
+use actix_web::web::{Form, Path};
 use serde::Deserialize;
 use crate::models::post::Post;
 use crate::models::topic::Topic;
+use crate::utils::random_id::random_integer;
 use crate::utils::restriction;
-use crate::{utils, SETTING};
+use crate::{utils, PollState, POLL_INSTANCE, SETTING};
 
 
 #[derive(Deserialize)]
@@ -18,7 +19,7 @@ pub struct MakeTopicJson {
 // /◯◯/make/post formタグでやる
 pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data: Form<MakeTopicJson>) -> impl Responder {
 
-    let mut name = &data.name;
+    let mut name = &utils::html::html_escape(&data.name);
     let body = &utils::html::html_escape(&data.body);
 
     let ip_addr = utils::get_ip::get_ipaddr_from_header(&req).unwrap_or(String::from("???"));
@@ -70,6 +71,14 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data
                     
                     match topic.post(post).await {
                         Ok(()) => {
+                            let mut poll_instance = POLL_INSTANCE.lock().unwrap();
+
+                            *poll_instance = PollState {
+                                topic_id: bbspath.topic_id.clone(),
+                                randvalue: random_integer(64),
+                                bbs_id: bbspath.bbs_id.clone()
+                            };
+
                             return HttpResponse::Ok()
                                 .body("OK");
                         },

@@ -6,6 +6,8 @@ use actix_web::{
     web::Data,
 };
 
+use std::sync::Mutex;
+
 use tokio;
 use tera::Tera;
 
@@ -22,6 +24,22 @@ const SETTING: Lazy<utils::setting::ApplicationSetting> = Lazy::new(|| {
     setting
 });
 
+// ロングポーリング用
+
+#[derive(Clone)]
+struct PollState {
+    randvalue: String,
+    bbs_id: String,
+    topic_id: String
+}
+
+static POLL_INSTANCE: Lazy<Mutex<PollState>> = Lazy::new(|| {
+    Mutex::new(PollState { 
+        randvalue: String::new(),
+        bbs_id: String::new(),
+        topic_id: String::new()
+    })
+});
 
 
 #[derive(Clone)]
@@ -48,7 +66,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .route("/{bbs_id}/topic/{topic_id}", get().to(views::topic::endpoint))
             .route("/{bbs_id}/make/topic", post().to(controls::maketopic::endpoint))
             .route("/{bbs_id}/make/post/{topic_id}", post().to(controls::makepost::endpoint))
-            
+            .route("/{bbs_id}/poll/{topic_id}", get().to(controls::reload::endpoint))
     })
         .bind(format!("{}:{}", SETTING.bind_addr, SETTING.bind_port))?
         .run()
