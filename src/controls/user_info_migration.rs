@@ -22,14 +22,22 @@ pub async fn endpoint(req: HttpRequest, form_: Form<MigrationRequest>, data: Dat
     let html = if let Some(ip_addr) = get_ipaddr_from_header(&req) {
         match (User::from_token(&form_.user_token).await, User::from(&ip_addr).await) {
             (Ok(user), Ok(mut new_user)) => {
-                if let Err(e) = new_user.migration_userip(&user.ip_addr, &user.token).await {
+                if let Err(e) = new_user.migration_userip(&ip_addr, &user.token).await {
                     eprintln!("エラー\t\t{}", e);
                     tera.render("user/fail_userdata_migration.html", &ctx)
                 } else {
                     tera.render("user/success_userdata_migration.html", &ctx)
                 }
             },
-            _ => {
+            (error1, error2) => {
+                if let Err(error) = error1 {
+                    eprintln!("エラー\t\t{}", error);
+                }
+
+                if let Err(error) = error2 {
+                    eprintln!("エラー\t\t{}", error);
+                }
+
                 tera.render("user/fail_userdata_migration.html", &ctx)
             }
         }

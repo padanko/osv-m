@@ -1,5 +1,7 @@
 use rand::random_range;
 
+use crate::{models::user::User, utils::setting::BbsSetting, SETTING};
+
 /////////////////////////////////////
 
 pub struct Rand;
@@ -23,31 +25,41 @@ impl super::OsvCommand for Rand {
 
 /////////////////////////////////////
 
-pub struct UrlAndImage;
+pub struct UrlAndImage {
+    tmp_val: i32,
+    bbs_id: String
+}
 
 impl UrlAndImage {
-    pub fn new() -> Self {
-        Self { }
+    pub fn new(user: &User, bbs_id: &str) -> Self {
+        Self {
+            tmp_val: user.level as i32,
+            bbs_id: bbs_id.to_string()
+        }
     }
 }
 
 impl super::OsvCommand for UrlAndImage {
     fn apply(&self, body_html: &str) -> String {
-        let mut lines: Vec<String> = Vec::new();
+        if let Some(bbs_setting) = SETTING.bbs.get(&self.bbs_id) {
+            let mut lines: Vec<String> = Vec::new();
 
-        for line in body_html.lines() {
-            if line.starts_with("!URL:") {
-                let args_: String = line.chars().skip(5).collect();
-                lines.push(format!("<a href='{args_}' target='blank_'>{args_}</a>"));
-            } else if line.starts_with("!Img:") {
-                let args_: String = line.chars().skip(5).collect();
-                lines.push(format!("<img src='{}' class='image-post'>", args_));
-            } else {
-                lines.push(line.to_string());
+            for line in body_html.lines() {
+                if line.starts_with("!URL:") {
+                    let args_: String = line.chars().skip(5).collect();
+                    lines.push(format!("<a href='{args_}' target='blank_'>{args_}</a>"));
+                } else if line.starts_with("!Img:") && !bbs_setting.restriction_image {
+                    let args_: String = line.chars().skip(5).collect();
+                    lines.push(format!("<img src='{}' class='image-post'>", args_));
+                } else {
+                    lines.push(line.to_string());
+                }
             }
-        }
 
-        lines.join("\n")
+            lines.join("\n")
+        } else {
+            body_html.to_string()
+        }
     }
 }
 

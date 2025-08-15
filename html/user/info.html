@@ -47,7 +47,7 @@
     <h2>端末移行</h2>
     <p>端末の情報を移行する場合は、こちらに前に使用していたユーザートークンをペーストしてください。</p>
     <p><b style="color: red">※移行前のお使いの端末のユーザー情報は移行後に削除されます</b></p>
-    <form action="/dev/change-ip-addr" method="post">
+    <form action="{{baseurl|safe}}/dev/change-ip-addr" method="post">
         <button type="submit">移行</button>
         <input type="text" style="width: 60%;" name="user_token" placeholder="ユーザートークン">
     </form>

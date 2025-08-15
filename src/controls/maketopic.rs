@@ -37,7 +37,7 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsPath>, data: For
     };
 
     let body = if SETTING.enable_command {
-        &crate::commands::apply_all(&body, &user)
+        &crate::commands::apply_all(&body, &user, &bbspath.bbs_id)
     } else {
         body
     };
@@ -96,7 +96,7 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsPath>, data: For
                 
                 let _ = topic.post(post).await;
 
-                let new_path = format!("{}/{}/topic/{}/", &SETTING.base_url, &bbspath.bbs_id, &topic.topic_id);
+                let new_path = format!("{}/{}/topic/{}", &SETTING.base_url, &bbspath.bbs_id, &topic.topic_id);
 
                 HttpResponse::MovedPermanently()
                     .append_header(("Location", new_path))

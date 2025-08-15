@@ -35,7 +35,7 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data
     };
 
     let body = if SETTING.enable_command {
-        &crate::commands::apply_all(&body, &user)
+        &crate::commands::apply_all(&body, &user, &bbspath.bbs_id)
     } else {
         body
     };

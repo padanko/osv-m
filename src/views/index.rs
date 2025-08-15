@@ -1,5 +1,5 @@
 use actix_web::{web::{Data}, HttpResponse, Responder};
-use crate::{ActixWebData, SETTING};
+use crate::{utils::tip::random_tip, ActixWebData, SETTING};
 
 use tera::Context;
 
@@ -12,7 +12,7 @@ pub async fn endpoint(data: Data<ActixWebData>) -> impl Responder {
     ctx.insert("description", &SETTING.description);
     ctx.insert("bbs_num", &SETTING.bbs.len());
     ctx.insert("baseurl", &SETTING.base_url);
-    
+    ctx.insert("tip", &random_tip()); 
 
     match data.tera.render("index.html", &ctx) {
         Ok(html) => {

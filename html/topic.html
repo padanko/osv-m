@@ -123,7 +123,6 @@
             type: "GET",
             success: (d)=>{
                 console.log(d);
-                long_poll();
 
                 var index = topic_data.querySelectorAll("dl").length + 1;
 
@@ -142,6 +141,7 @@
 </dl>`
 
                 topic_data.appendChild(topic);
+                long_poll();
             },
             cache: (e) => {
                 console.error(e);
