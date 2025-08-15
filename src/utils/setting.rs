@@ -55,21 +55,27 @@ pub struct ApplicationSetting {
 
     // フォーマット
     pub datetime_format: String,
+    pub user_info_unknown_text: String,
 
     // コマンド
     pub enable_command: bool
 }
 
+impl ApplicationSetting {
+    pub fn from_file(filename: &str) -> Result<Self, Box<dyn std::error::Error>> {
+        let mut setting_file = File::open(filename)?;
+        let mut setting_file_buffer = String::new();
+
+        setting_file.read_to_string(&mut setting_file_buffer)?;
+
+        let setting: ApplicationSetting = serde_yaml::from_str(&setting_file_buffer)?;
+        
+        Ok(setting)
+    }
+}
+
 const SETTING_FILENAME: &str = "./osv-m_setting.yaml";
 
 pub fn get_setting() -> Result<ApplicationSetting, Box<dyn std::error::Error>> {
-    
-    let mut setting_file = File::open(SETTING_FILENAME)?;
-    let mut setting_file_buffer = String::new();
-
-    setting_file.read_to_string(&mut setting_file_buffer)?;
-
-    let setting: ApplicationSetting = serde_yaml::from_str(&setting_file_buffer)?;
-    
-    Ok(setting)
+    Ok(ApplicationSetting::from_file(SETTING_FILENAME)?)
 }

@@ -48,7 +48,7 @@ impl Topic {
 
     pub async fn commit(&self) -> Result<(), Box<dyn std::error::Error>> {
 
-        let connect: Pool<Postgres> = super::connect().await?;
+        let connect: Pool<Postgres> = super::connect_from_setting().await?;
 
         connect.begin().await?;
 
@@ -73,7 +73,7 @@ impl Topic {
 
     pub async fn from(bbs_id: &str, topic_id: &str) -> Result<Self, Box<dyn std::error::Error>> {
 
-        let connect: Pool<Postgres> = super::connect().await?;
+        let connect: Pool<Postgres> = super::connect_from_setting().await?;
 
         let topic = query_as::<Postgres, TopicRow>(include_str!("../../sql/topic_get.sql"))
             .bind(bbs_id)
@@ -95,7 +95,7 @@ impl Topic {
 
     pub async fn from_vec(bbs_id: &str) -> Result<Vec<Self>, Box<dyn std::error::Error>> {
 
-        let connect: Pool<Postgres> = super::connect().await?;
+        let connect: Pool<Postgres> = super::connect_from_setting().await?;
 
         let topics_ = query_as::<Postgres, TopicRow>(include_str!("../../sql/topics_get.sql"))
             .bind(bbs_id)
@@ -121,15 +121,5 @@ impl Topic {
 
         Ok(topics)
 
-    }
-}
-
-#[cfg(test)]
-mod test {
-
-    #[tokio::test]
-    async fn test_post_generate() {
-        let topic = super::Topic::from_vec("inkor").await.unwrap();
-        println!("{:?}", topic);
     }
 }

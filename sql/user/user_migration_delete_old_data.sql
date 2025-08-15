@@ -1,0 +1,1 @@
+DELETE FROM osvm_userlist WHERE token = $1;

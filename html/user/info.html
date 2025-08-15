@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー情報の表示 - {{title}}</title>
+    <style>
+        .secret {
+            background-color: black;
+            color: black;
+        }
+
+        .secret:hover {
+            background-color: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>ユーザー情報</h1>
+    <p>お使いの端末のユーザー情報です。</p>
+    <hr>
+    <table border="1">
+        <tr>
+            <td>リモートアドレス</td>
+            <td>{{ip_addr}}</td>
+        </tr>
+        <tr>
+            <td>今日のID</td>
+            <td>{{user_id}}</td>
+        </tr>
+        <tr>
+            <td>吸込規制</td>
+            <td>{{user_vacuum}}</td>
+        </tr>
+        <tr>
+            <td>ユーザートークン</td>
+            <td><span class="secret">{{user_token}}</span></td>
+        </tr>
+        <tr>
+            <td>総合書き込み回数</td>
+            <td>{{user_postcount}}</td>
+        </tr>
+    </table>
+    <b style="color: red">※ユーザートークンは絶対に他の人に共有しないでください。</b>
+    <hr>
+    <h2>端末移行</h2>
+    <p>端末の情報を移行する場合は、こちらに前に使用していたユーザートークンをペーストしてください。</p>
+    <p><b style="color: red">※移行前のお使いの端末のユーザー情報は移行後に削除されます</b></p>
+    <form action="/dev/change-ip-addr" method="post">
+        <button type="submit">移行</button>
+        <input type="text" style="width: 60%;" name="user_token" placeholder="ユーザートークン">
+    </form>
+    <hr>
+    <a href="{{baseurl|safe}}">{{title}}</a>
+</body>
+</html>

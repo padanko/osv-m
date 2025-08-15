@@ -1,0 +1,1 @@
+SELECT user_level, vacuum, user_ip FROM osvm_userlist WHERE token = $1

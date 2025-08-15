@@ -35,14 +35,14 @@ impl Post {
         Self {
             name: name.to_string(),
             body: body.to_string(),
-            user_id: random_id::generate_user_id(&user.ip_addr),
+            user_id: random_id::generate_user_view_id(&user.ip_addr),
             datetime: Local::now().naive_local()
         }
     }
 
     pub async fn commit(&self, bbs_id: &str, topic_id: &str) -> Result<(), Box<dyn std::error::Error>> {
 
-        let connect: Pool<Postgres> = super::connect().await?;
+        let connect: Pool<Postgres> = super::connect_from_setting().await?;
 
         connect.begin().await?;
 
@@ -59,13 +59,12 @@ impl Post {
     
     pub async fn from_vec(bbs_id: &str, topic_id: &str) -> Result<Vec<Post>, Box<dyn std::error::Error>> {
 
-        let connect: Pool<Postgres> = super::connect().await?;
+        let connect: Pool<Postgres> = super::connect_from_setting().await?;
 
         let posts_ = query_as::<Postgres, PostRow>(include_str!("../../sql/posts_get.sql"))
             .bind(bbs_id)
             .bind(topic_id)
             .fetch_all(&connect).await?;
-
         let mut posts = Vec::new();
 
         for postrow in posts_ {

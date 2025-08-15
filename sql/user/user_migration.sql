@@ -1,0 +1,1 @@
+UPDATE osvm_userlist SET user_ip = $1 WHERE token = $2

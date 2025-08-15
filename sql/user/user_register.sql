@@ -1,1 +1,1 @@
-INSERT INTO osvm_userlist (user_ip, vacuum, user_level) VALUES ($1, FALSE, 1)
+INSERT INTO osvm_userlist (user_ip, vacuum, user_level, token) VALUES ($1, FALSE, 1, $2)

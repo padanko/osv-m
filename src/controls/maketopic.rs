@@ -82,7 +82,8 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsPath>, data: For
     
     if !title.is_empty() && !body.is_empty() {
 
-        user.level -= 2;
+        user.level = user.level.saturating_sub(2);
+        let _ = user.update().await;
 
         let topic = Topic::new(&data.title, password, None, &bbspath.bbs_id);
 

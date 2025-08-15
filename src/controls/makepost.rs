@@ -58,6 +58,7 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data
 
         if restriction::body_check(body, bbs_setting) || user.vacuum {
             user.vacuum = true;
+            let _ = user.update().await;
 
             
             let period_vacuum = bbs_setting.vacuum_period_sec;
