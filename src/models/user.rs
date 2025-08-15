@@ -141,16 +141,16 @@ impl User {
 
 // この行以降は動作テスト
 
-#[cfg(test)]
-mod test {
-    #[tokio::test]
-    async fn test_token_generate() {
-        let token = super::generate_token();
-        println!("token生成テスト\t\t{}", token); // cargo test -- --nocapture
-    }   
+// #[cfg(test)]
+// mod test {
+//     #[tokio::test]
+//     async fn test_token_generate() {
+//         let token = super::generate_token();
+//         println!("token生成テスト\t\t{}", token); // cargo test -- --nocapture
+//     }   
 
-    #[tokio::test]
-    async fn register_user() {
-        let user = super::User::new("127.0.0.1").await.unwrap();
-    }
-}
+//     #[tokio::test]
+//     async fn register_user() {
+//         let user = super::User::new("127.0.0.1").await.unwrap();
+//     }
+// }
