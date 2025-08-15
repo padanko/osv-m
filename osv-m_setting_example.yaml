@@ -6,7 +6,7 @@ bind_port: 8282
 cloudflare_dns_proxy: false
 id_length: 3
 id_charset: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-id_raw_prefix: "TEST"
+id_raw_prefix: "OSVMHonzawaServer"
 html_folder: ./html/*.html
 postgresql_addr: localhost
 postgresql_port: 5432
@@ -30,6 +30,7 @@ bbs:
     restriction_words: []
     hide_id: false
 
+enable_command: true
 
 topic_id_digcount: null
 

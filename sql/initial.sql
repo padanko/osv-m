@@ -19,4 +19,5 @@ CREATE TABLE osvm_userlist (
     user_ip TEXT NOT NULL,
     vacuum BOOLEAN NOT NULL,
     user_level INTEGER NOT NULL,
+    token VARCHAR(32) NOT NULL
 );
