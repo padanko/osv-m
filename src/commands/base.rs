@@ -1,6 +1,6 @@
 use rand::random_range;
 
-use crate::{models::user::User, utils::setting::BbsSetting, SETTING};
+use crate::SETTING;
 
 /////////////////////////////////////
 
@@ -26,14 +26,12 @@ impl super::OsvCommand for Rand {
 /////////////////////////////////////
 
 pub struct UrlAndImage {
-    tmp_val: i32,
     bbs_id: String
 }
 
 impl UrlAndImage {
-    pub fn new(user: &User, bbs_id: &str) -> Self {
+    pub fn new(bbs_id: &str) -> Self {
         Self {
-            tmp_val: user.level as i32,
             bbs_id: bbs_id.to_string()
         }
     }

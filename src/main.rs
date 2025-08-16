@@ -11,6 +11,7 @@ use std::sync::Mutex;
 use tokio;
 use tera::Tera;
 
+mod extension;
 mod utils;
 mod views;
 mod controls;
@@ -21,15 +22,15 @@ mod commands;
 
 use once_cell::sync::Lazy;
 
-#[cfg(test)]
-const SETTING: Lazy<utils::setting::ApplicationSetting> = Lazy::new(|| {
+// #[cfg(test)]
+// const SETTING: Lazy<utils::setting::ApplicationSetting> = Lazy::new(|| {
 
-    let setting = utils::setting::ApplicationSetting::from_file("./test/setting.yaml").expect("設定を取得できませんでした");
+//     let setting = utils::setting::ApplicationSetting::from_file("./test/setting.yaml").expect("設定を取得できませんでした");
 
-    setting
-});
+//     setting
+// });
 
-#[cfg(not(test))]
+// #[cfg(not(test))]
 const SETTING: Lazy<utils::setting::ApplicationSetting> = Lazy::new(|| {
 
     let setting = utils::setting::get_setting().expect("設定を取得できませんでした");

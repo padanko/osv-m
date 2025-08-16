@@ -9,7 +9,8 @@ use tera::Context;
 #[derive(Serialize)]
 pub struct BbsList {
     pub bbsname: String,
-    pub bbsid: String
+    pub bbsid: String,
+    pub hide: bool
 }
 
 pub async fn endpoint(data: Data<ActixWebData>) -> impl Responder {
@@ -28,7 +29,8 @@ pub async fn endpoint(data: Data<ActixWebData>) -> impl Responder {
         if let Some(bbs_setting) = setting.bbs.get(bbsid) {
             bbslist_.push(BbsList {
                 bbsname: bbs_setting.title.to_string(),
-                bbsid: bbsid.to_string()
+                bbsid: bbsid.to_string(),
+                hide: bbs_setting.hide_link
             })        
         }
     }

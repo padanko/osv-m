@@ -22,6 +22,7 @@ pub struct BbsSetting {
     pub title_max_length: usize,
     pub restriction_words: Vec<String>,
     pub hide_id: bool,
+    pub hide_link: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -58,7 +59,9 @@ pub struct ApplicationSetting {
     pub user_info_unknown_text: String,
 
     // コマンド
-    pub enable_command: bool
+    pub enable_command: bool,
+    pub rhai_ext_command: bool,
+    pub rhai_exts_path: String
 }
 
 impl ApplicationSetting {
