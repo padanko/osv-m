@@ -2,6 +2,7 @@ pub mod maketopic;
 pub mod makepost;
 pub mod reload;
 pub mod user_info_migration;
+pub mod headline;
 
 use serde::Deserialize;
 

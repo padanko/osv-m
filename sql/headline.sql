@@ -1,0 +1,1 @@
+SELECT * FROM osvm_posts WHERE bbs_id = $1 ORDER BY date_time DESC LIMIT 20

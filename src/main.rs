@@ -81,6 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .route("/{bbs_id}/topic/{topic_id}", get().to(views::topic::endpoint))
             .route("/{bbs_id}/make/topic", post().to(controls::maketopic::endpoint))
             .route("/{bbs_id}/make/post/{topic_id}", post().to(controls::makepost::endpoint))
+            .route("/{bbs_id}/get/headline", get().to(controls::headline::endpoint))
             .route("/{bbs_id}/poll/{topic_id}", get().to(controls::reload::endpoint))
             .route("/dev/change-ip-addr", post().to(controls::user_info_migration::endpoint))
     })
