@@ -13,7 +13,7 @@ const RHAI_INSTANCE: Lazy<RhaiExtRuntime> = Lazy::new(|| {
 
     rhai_engine.register_fn("epoch_time", crate::utils::random_id::epoch_time);
     rhai_engine.register_fn("random_integer", |x: i64| {
-        crate::utils::random_id::random_integer((if x <= 1 { 1 } else { x }) as usize)
+        crate::utils::random_id::random_integer(x.min(1) as usize)
     });
 
     rhai_engine.register_fn("random_topicid", crate::utils::random_id::generate_topic_id);

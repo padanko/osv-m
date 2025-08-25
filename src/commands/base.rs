@@ -19,6 +19,10 @@ impl super::OsvCommand for Rand {
             body = body.replacen("!random", &format!("<b class='random'>{}</b>", random_range(0..=100)), 1);
         }
 
+        for _ in 0..body_html.matches("!rand").count() {
+            body = body.replacen("!rand", &format!("<b class='random'>{}</b>", random_range(0..=100)), 1);
+        }
+
         body.to_string()
     }
 }
@@ -49,7 +53,14 @@ impl super::OsvCommand for UrlAndImage {
                 } else if line.starts_with("!Img:") && !bbs_setting.restriction_image {
                     let args_: String = line.chars().skip(5).collect();
                     lines.push(format!("<img src='{}' class='image-post'>", args_));
-                } else {
+	            } else if line.starts_with("https://i.imgur.com/") && !bbs_setting.restriction_image {
+		            // Open2ch方式
+                    let args_: String = line.to_string();
+                    lines.push(format!("<img src='{}' class='image-post'>", args_));
+                } else if line.starts_with("https://") && !bbs_setting.restriction_image {
+                    let args_: String = line.to_string();
+                    lines.push(format!("<a href='{}'>{}</a>", args_, args_));
+		        } else {
                     lines.push(line.to_string());
                 }
             }
