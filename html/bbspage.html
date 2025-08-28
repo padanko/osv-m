@@ -22,7 +22,7 @@
 </td></tr></table>
 <br>
 <table border=1 cellspacing=7 cellpadding=3 width=95% bgcolor=#CCFFCC align=center><tr><td>
-    <b>トピック一覧(更新順上位20個)</b>
+    <b>トピック一覧(更新順上位35個)</b>
     <div style="text-align: center;">
         <div style="height:130px; overflow-y: scroll; width: 90vw; text-align: left;">
             <ol id="headline">
@@ -55,42 +55,42 @@
         <input type="text" id="mt-password" name="password">
     </form>
 </td></tr></table>
+</body>
 <script>
     const headline = document.getElementById("headline");
-
+    var old = [{datetime: ""}]
     var update = ()=>{
         fetch("{{baseurl|safe}}/{{bbs_id}}/get/headline")
             .then((d)=>{return d.json()})
             .then(d=>{
-                headline.innerHTML="";
-                console.log(d);
-                d.data.forEach(item => {
-                    var element = document.createElement("li");
-                    var dl = document.createElement("dl");
-                    var dt = document.createElement("dt");
-                    var dd = document.createElement("dd");
-
-                    var link = document.createElement("a");
-
-                    link.href=`{{baseurl|safe}}/{{bbs_id}}/topic/${item.topicid}`;
-                    link.innerText="【元スレ】"
-
-                    var body = document.createElement("p");
-                    body.innerHTML=item.body;
-
-                    dd.appendChild(body);
-                    dt.appendChild(link);
-                    dl.appendChild(dt);
-                    dl.appendChild(dd);
-                    element.appendChild(dl);
-                    headline.appendChild(element);
-                });
+                if (d.data[0]["datetime"] != old[0]["datetime"]) {
+                    headline.innerHTML="";
+                    console.log(d.data[0]["datetime"], old[0]["datetime"]);
+                    old = d.data;
+                    d.data.forEach(item => {
+                        var element = document.createElement("li");
+                        var dl = document.createElement("dl");
+                        var dt = document.createElement("dt");
+                        var dd = document.createElement("dd");
+                        var link = document.createElement("a");
+                        link.href=`{{baseurl|safe}}/{{bbs_id}}/topic/${item.topicid}`;
+                        link.innerText=item.title;
+                        var count = document.createElement("small");
+                        count.innerText = `(${item.count})`;
+                        var body = document.createElement("p");
+                        body.innerHTML=item.body;
+                        dd.appendChild(body);
+                        dt.appendChild(link);
+                        dt.appendChild(count);
+                        dl.appendChild(dt);
+                        dl.appendChild(dd);
+                        element.appendChild(dl);
+                        headline.appendChild(element);
+                    });
+                }
             })
     }
-
     update()
-
     setInterval(update,5000)
 </script>
-</body>
 </html>
