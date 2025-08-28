@@ -1,5 +1,5 @@
-use crate::utils::random_id;
-
+use crate::utils::{random_id, restriction};
+use crate::SETTING;
 use sqlx::pool::Pool;
 use sqlx::prelude::FromRow;
 use sqlx::Postgres;
@@ -103,3 +103,53 @@ impl Post {
     
 }
 
+
+// (規制: bool, 新しいハンドルネーム: String)
+pub fn post_filter(body: &str, name: &str, bbs_id: &str) -> (bool, String) {
+    if let Some(bbs_setting) = SETTING.bbs.get(bbs_id) {
+
+        let default_name = &bbs_setting.default_name;
+
+        
+        let new_name = if name.is_empty() || bbs_setting.restriction_handlename {
+            default_name.to_string()
+        } else {
+            name.to_string()
+        };
+
+        let is_body_lengthexceeds = body.chars().count() > bbs_setting.body_max_length;
+        let is_name_lengthexceeds = name.chars().count() > bbs_setting.name_max_length;
+
+
+        if is_body_lengthexceeds || is_name_lengthexceeds {
+            return (true, new_name);
+        }
+
+        if restriction::body_check(body, bbs_setting) {
+            return (true, new_name);
+        }
+
+        // ↓この機能は別のところで実装する
+        //  if restriction::body_check(body, bbs_setting) || user.vacuum {
+        //      user.vacuum = true;
+        //      let _ = user.update().await;
+
+            
+        //  let period_vacuum = bbs_setting.vacuum_period_sec;
+
+        //  tokio::spawn(async move {
+        //      sleep(Duration::from_secs(period_vacuum)).await;
+        //      user.vacuum = false;
+        //      let _ = user.update().await;
+        //  });
+
+        //      return HttpResponse::Forbidden()
+        //          .body(include_str!("../../default_html/error_unknown.html"));
+        //  }
+
+        // }
+        (false, new_name)
+    } else {
+        (true, name.to_string())
+    }
+}

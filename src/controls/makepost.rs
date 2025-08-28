@@ -2,14 +2,14 @@ use actix_web::{HttpRequest, Responder, HttpResponse};
 use actix_web::web::{Form, Path};
 use serde::Deserialize;
 
+use crate::models::post;
 use crate::models::post::Post;
 use crate::models::topic::Topic;
 use crate::models::user::User;
 use crate::utils::random_id::random_integer;
-use crate::utils::restriction;
 use crate::{utils, PollState, POLL_INSTANCE, SETTING};
 
-use tokio::time::{Duration, sleep};
+// use tokio::time::{Duration, sleep};
 
 #[derive(Deserialize)]
 pub struct MakeTopicJson {
@@ -22,7 +22,7 @@ pub struct MakeTopicJson {
 // /◯◯/make/post formタグでやる
 pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data: Form<MakeTopicJson>) -> impl Responder {
 
-    let mut name = &utils::html::html_escape(&data.name);
+    let name = &utils::html::html_escape(&data.name);
     let body = &utils::html::html_escape(&data.body);
 
     let ip_addr = utils::get_ip::get_ipaddr_from_header(&req).unwrap_or(String::from("???"));
@@ -40,43 +40,44 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data
         body
     };
 
-    let bbs_ = &SETTING.bbs;
+    // let bbs_ = &SETTING.bbs;
 
-    if let Some(bbs_setting) = bbs_.get(&bbspath.bbs_id) {
-        let default_name = &bbs_setting.default_name;
-        if name.is_empty() || bbs_setting.restriction_handlename{
-            name = default_name;
-        }
+    // if let Some(bbs_setting) = bbs_.get(&bbspath.bbs_id) {
+    //     let default_name = &bbs_setting.default_name;
+    //     if name.is_empty() || bbs_setting.restriction_handlename{
+    //         name = default_name;
+    //     }
 
-        let has_body_lengthexceeds = body.chars().count() > bbs_setting.body_max_length;
-        let has_name_lengthexceeds = name.chars().count() > bbs_setting.name_max_length;
+    //     let has_body_lengthexceeds = body.chars().count() > bbs_setting.body_max_length;
+    //     let has_name_lengthexceeds = name.chars().count() > bbs_setting.name_max_length;
         
-        if has_body_lengthexceeds || has_name_lengthexceeds {
-            return HttpResponse::Forbidden()
-                .body(include_str!("../../default_html/error_has_length_exceeds.html"));
-        }
+    //     if has_body_lengthexceeds || has_name_lengthexceeds {
+    //         return HttpResponse::Forbidden()
+    //             .body(include_str!("../../default_html/error_has_length_exceeds.html"));
+    //     }
 
-        if restriction::body_check(body, bbs_setting) || user.vacuum {
-            user.vacuum = true;
-            let _ = user.update().await;
+    //     if restriction::body_check(body, bbs_setting) || user.vacuum {
+    //         user.vacuum = true;
+    //         let _ = user.update().await;
 
             
-            let period_vacuum = bbs_setting.vacuum_period_sec;
+    //         let period_vacuum = bbs_setting.vacuum_period_sec;
 
-            tokio::spawn(async move {
-                sleep(Duration::from_secs(period_vacuum)).await;
-                user.vacuum = false;
-                let _ = user.update().await;
-            });
+    //         tokio::spawn(async move {
+    //             sleep(Duration::from_secs(period_vacuum)).await;
+    //             user.vacuum = false;
+    //             let _ = user.update().await;
+    //         });
 
-            return HttpResponse::Forbidden()
-                .body(include_str!("../../default_html/error_unknown.html"));
-        }
+    //         return HttpResponse::Forbidden()
+    //             .body(include_str!("../../default_html/error_unknown.html"));
+    //     }
 
-    }
+    // }
 
+    let (restriction, new_name) = post::post_filter(body, name, &bbspath.bbs_id);
     
-    if !body.is_empty() {
+    if !body.is_empty() || !restriction {
 
         user.level += 1;
 
@@ -98,7 +99,7 @@ pub async fn endpoint(req: HttpRequest, bbspath: Path<super::BbsTopicPath>, data
 
                 if password_is_valid {
 
-                    let post = Post::new(name, body, &user);
+                    let post = Post::new(&new_name, body, &user);
                     
                     match topic.post(post).await {
                         Ok(()) => {
