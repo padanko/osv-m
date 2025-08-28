@@ -29,9 +29,11 @@ bbs:
     body_max_length: 100
     restriction_words: []
     hide_id: false
-
+    hide_link: false
+    
 enable_command: true
-
 topic_id_digcount: null
-
 datetime_format: "%Y/%m/%d %H:%M:%S"
+user_info_unknown_text: "不明"
+rhai_ext_command: true
+rhai_exts_path: "./extension/"
