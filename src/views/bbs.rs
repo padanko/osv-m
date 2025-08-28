@@ -35,6 +35,8 @@ pub async fn endpoint(data: Data<ActixWebData>, bbspath: Path<BbsPath>) -> impl 
         ctx.insert("baseurl", &SETTING.base_url);
         ctx.insert("bannerurl", &bbs.banner);
 
+        ctx.insert("version", &crate::VERSION);
+
         match topic::Topic::from_vec(&bbspath.bbs_id).await {
             Ok(topics) => {
                 let mut topic_ctx: Vec<TopicToString> = Vec::new();

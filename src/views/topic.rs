@@ -40,6 +40,8 @@ pub async fn endpoint(data: Data<ActixWebData>, bbspath: Path<BbsPath>) -> impl 
                 ctx.insert("password_enable", &(topic.topic_password != None));
                 ctx.insert("hide_id", &bbs.hide_id);
 
+                ctx.insert("version", &crate::VERSION);
+
                 let mut posts_ctx = Vec::new();
 
                 for post in topic.posts {

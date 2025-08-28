@@ -14,6 +14,8 @@ pub async fn endpoint(data: Data<ActixWebData>) -> impl Responder {
     ctx.insert("baseurl", &SETTING.base_url);
     ctx.insert("tip", &random_tip()); 
 
+    ctx.insert("version", &crate::VERSION);
+
     match data.tera.render("index.html", &ctx) {
         Ok(html) => {
             HttpResponse::Ok()
