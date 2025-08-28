@@ -22,6 +22,8 @@ mod commands;
 
 use once_cell::sync::Lazy;
 
+const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+
 // #[cfg(test)]
 // const SETTING: Lazy<utils::setting::ApplicationSetting> = Lazy::new(|| {
 
